@@ -1,19 +1,34 @@
+databases:
+  - name: habit-tracker-app-db
+    databaseName: habit_tracker_app_db
+    plan: free
+
 services:
   - type: web
-    name: habit-tracker-backend
+    name: habit-tracker-app-backend
     runtime: python
+    plan: free
     buildCommand: pip install -r app/requirements.txt
     startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
     envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: habit-tracker-app-db
+          property: connectionString
       - key: SECRET_KEY
         generateValue: true
 
   - type: web
+    name: habit-tracker-app-frontend
     runtime: static
-    name: habit-tracker-frontend
-    buildCommand: npm install && npm run build
-    staticPublishPath: dist
+    buildCommand: npm ci && npm run build
+    staticPublishPath: ./dist
+    pullRequestPreviewsEnabled: true
     routes:
       - type: rewrite
         source: /*
         destination: /index.html
+    envVars:
+      - key: VITE_API_URL
+        sync: false
