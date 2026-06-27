@@ -9,4 +9,4 @@ class User(Base):
     email = Column(String, nullable=False)
     password_hash = Column(String, nullable=False)
     created_at = Column(DateTime, server_default=func.now(), nullable=False)
-    is_active = Column(Boolean, nullable=False)
+    is_active = Column(Boolean, nullable=False, default=True)
