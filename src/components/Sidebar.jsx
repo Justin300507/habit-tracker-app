@@ -8,7 +8,7 @@ const Sidebar = () => (
       <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center">
         <span className="text-white text-sm font-bold">A</span>
       </div>
-      <span className="font-bold text-white text-sm">AppName</span>
+      <span className="font-bold text-white text-sm">StreakFlow</span>
     </div>
     <nav className="flex-1 space-y-0.5">
       <NavLink to="/dashboard" className={({isActive}) => `flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${isActive ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:bg-slate-800 hover:text-white'}`}>
