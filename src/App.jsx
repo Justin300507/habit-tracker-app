@@ -1,5 +1,9 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+
+const PrivateRoute = ({ children }) => {
+  return localStorage.getItem('token') ? children : <Navigate to="/login" replace />;
+};
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import PasswordResetRequest from './pages/PasswordResetRequest';
@@ -29,11 +33,11 @@ const App = () => (
       <Route path="/register" element={<Signup />} />
       <Route path="/password-reset-request" element={<PasswordResetRequest />} />
       <Route path="/password-reset" element={<PasswordReset />} />
-      <Route path="/dashboard" element={<Layout><Dashboard /></Layout>} />
-      <Route path="/habits" element={<Layout><HabitList /></Layout>} />
-      <Route path="/habits/new" element={<Layout><HabitNew /></Layout>} />
-      <Route path="/habits/:habitId" element={<Layout><HabitDetail /></Layout>} />
-      <Route path="/habits/:habitId/edit" element={<Layout><HabitEdit /></Layout>} />
+      <Route path="/dashboard" element={<PrivateRoute><Layout><Dashboard /></Layout></PrivateRoute>} />
+      <Route path="/habits" element={<PrivateRoute><Layout><HabitList /></Layout></PrivateRoute>} />
+      <Route path="/habits/new" element={<PrivateRoute><Layout><HabitNew /></Layout></PrivateRoute>} />
+      <Route path="/habits/:habitId" element={<PrivateRoute><Layout><HabitDetail /></Layout></PrivateRoute>} />
+      <Route path="/habits/:habitId/edit" element={<PrivateRoute><Layout><HabitEdit /></Layout></PrivateRoute>} />
       <Route path="*" element={<Navigate to="/login" replace />} />
     </Routes>
   </Router>

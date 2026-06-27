@@ -35,8 +35,8 @@ const Login = () => {
           <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">Sign in to your account</p>
         </div>
         <form onSubmit={handleSubmit} className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 p-6 space-y-4">
-          <Input label="Email" value={email} onChange={e => setEmail(e.target.value)} placeholder="you@example.com" />
-          <Input label="Password" type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="********" />
+          <Input label="Email" value={email} onChange={e => setEmail(e.target.value)} placeholder="you@example.com" required />
+          <Input label="Password" type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="********" required />
           {error && <p className="text-red-500 text-sm">{error}</p>}
           <Button type="submit" className="w-full justify-center" disabled={loading}>{loading ? 'Signing in...' : 'Sign In'}</Button>
         </form>
