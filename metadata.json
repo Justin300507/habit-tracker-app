@@ -1,0 +1,439 @@
+{
+    "project_name": "habit_tracker_app",
+    "description": "",
+    "plan": {
+        "project_name": "habit_tracker_app",
+        "display_name": "Habit Tracker",
+        "features": [
+            "Sign\u2011up, login, password reset, and JWT\u2011based session handling",
+            "Create, edit, delete, and list daily habits per user",
+            "Mark habits as done for the current day and store a log entry",
+            "Compute and display consecutive\u2011day streaks for each habit"
+        ],
+        "tech_stack": {
+            "backend": "FastAPI",
+            "database": "SQLite",
+            "auth": "JWT",
+            "frontend": "React + Vite"
+        },
+        "db_entities": [
+            "User",
+            "Habit",
+            "HabitLog"
+        ],
+        "api_modules": [
+            "auth",
+            "users",
+            "habits",
+            "habit_logs",
+            "dashboard"
+        ],
+        "user_stories": [
+            {
+                "role": "new user",
+                "want": "to create an account and log in securely",
+                "acceptance_criteria": [
+                    "User can sign up with email and password and receives a verification email",
+                    "User can log in with email/password and receives a JWT token",
+                    "Authenticated endpoints reject requests without a valid JWT"
+                ]
+            },
+            {
+                "role": "registered user",
+                "want": "to create a new daily habit",
+                "acceptance_criteria": [
+                    "Habit creation form requires a non\u2011empty name and optional description",
+                    "Created habit is stored with a reference to the creator's user ID",
+                    "API returns 201 with the habit object including its unique ID"
+                ]
+            },
+            {
+                "role": "registered user",
+                "want": "to mark a habit as completed for the current day",
+                "acceptance_criteria": [
+                    "User can tap a 'Complete' button on the habit list for today",
+                    "A HabitLog entry is created with date = today and linked to the habit",
+                    "Streak count increments if yesterday was also completed; otherwise it resets to 1"
+                ]
+            },
+            {
+                "role": "registered user",
+                "want": "to view the current streak for each habit",
+                "acceptance_criteria": [
+                    "Habit list displays a numeric streak badge next to each habit",
+                    "Streak badge updates in real\u2011time after a completion action",
+                    "Streak resets to 0 if a day is missed"
+                ]
+            },
+            {
+                "role": "registered user",
+                "want": "to see a weekly dashboard with completion percentages",
+                "acceptance_criteria": [
+                    "Dashboard shows a bar chart for the last 7 days with each habit's completion status",
+                    "A summary card displays total completed days / 7 and overall completion % across all habits",
+                    "Data updates when a habit is marked complete or unmarked"
+                ]
+            },
+            {
+                "role": "registered user",
+                "want": "to edit or delete an existing habit",
+                "acceptance_criteria": [
+                    "Edit form pre\u2011populates current habit name and description",
+                    "Saving changes updates the habit record and returns 200 with updated data",
+                    "Delete action prompts confirmation and removes the habit and its associated logs"
+                ]
+            }
+        ],
+        "non_functional_requirements": {
+            "authentication": "required \u2014 all user\u2011specific data must be protected",
+            "authorization": "users can only access their own habits and logs; no role hierarchy beyond basic user",
+            "pagination": "required on habit list endpoint (default 20 per page)",
+            "search": "habit names need case\u2011insensitive search",
+            "file_uploads": "no \u2014 the app does not support image or file attachments",
+            "real_time": "no \u2014 updates are fetched on demand; optional websockets can be added later"
+        },
+        "data_entities_detail": [
+            {
+                "name": "User",
+                "description": "Account information for each person using the app",
+                "key_fields": [
+                    "id",
+                    "email",
+                    "password_hash",
+                    "created_at"
+                ],
+                "relationships": [
+                    "has many Habit"
+                ]
+            },
+            {
+                "name": "Habit",
+                "description": "A habit definition created by a user",
+                "key_fields": [
+                    "id",
+                    "user_id",
+                    "name",
+                    "description",
+                    "created_at",
+                    "is_active"
+                ],
+                "relationships": [
+                    "belongs to User",
+                    "has many HabitLog"
+                ]
+            },
+            {
+                "name": "HabitLog",
+                "description": "Record that a habit was completed on a specific date",
+                "key_fields": [
+                    "id",
+                    "habit_id",
+                    "date",
+                    "created_at"
+                ],
+                "relationships": [
+                    "belongs to Habit"
+                ]
+            }
+        ],
+        "out_of_scope": [
+            "Social sharing of habit progress",
+            "Push or email notifications",
+            "AI\u2011driven habit recommendations",
+            "Cross\u2011device data sync beyond the local SQLite store"
+        ]
+    },
+    "architecture": {
+        "api_endpoints": [
+            {
+                "method": "POST",
+                "path": "/auth/signup",
+                "description": "Register a new user and send a verification email",
+                "file": "app\\routes\\auth_routes.py"
+            },
+            {
+                "method": "POST",
+                "path": "/auth/login",
+                "description": "Authenticate user credentials and return a JWT token",
+                "file": "app\\routes\\auth_routes.py"
+            },
+            {
+                "method": "POST",
+                "path": "/auth/password-reset-request",
+                "description": "Request a password reset; sends a reset token to the user's email",
+                "file": "app\\routes\\auth_routes.py"
+            },
+            {
+                "method": "POST",
+                "path": "/auth/password-reset",
+                "description": "Reset the user's password using a valid reset token",
+                "file": "app\\routes\\auth_routes.py"
+            },
+            {
+                "method": "GET",
+                "path": "/users/me",
+                "description": "Retrieve the profile of the currently authenticated user",
+                "file": "app\\routes\\user_routes.py"
+            },
+            {
+                "method": "PUT",
+                "path": "/users/me",
+                "description": "Update the authenticated user's profile information",
+                "file": "app\\routes\\user_routes.py"
+            },
+            {
+                "method": "GET",
+                "path": "/habits",
+                "description": "List habits for the authenticated user with pagination and case\u2011insensitive search",
+                "file": "app\\routes\\habit_routes.py"
+            },
+            {
+                "method": "POST",
+                "path": "/habits",
+                "description": "Create a new habit for the authenticated user",
+                "file": "app\\routes\\habit_routes.py"
+            },
+            {
+                "method": "GET",
+                "path": "/habits/{habit_id}",
+                "description": "Retrieve details of a specific habit, including its current streak",
+                "file": "app\\routes\\habit_routes.py"
+            },
+            {
+                "method": "PUT",
+                "path": "/habits/{habit_id}",
+                "description": "Update name, description, or activation status of a habit",
+                "file": "app\\routes\\habit_routes.py"
+            },
+            {
+                "method": "DELETE",
+                "path": "/habits/{habit_id}",
+                "description": "Delete a habit and all its associated logs",
+                "file": "app\\routes\\habit_routes.py"
+            },
+            {
+                "method": "POST",
+                "path": "/habits/{habit_id}/log",
+                "description": "Mark the habit as completed for today, create a HabitLog entry, and update the streak",
+                "file": "app\\routes\\habit_log_routes.py"
+            },
+            {
+                "method": "GET",
+                "path": "/habits/{habit_id}/logs",
+                "description": "List log entries for a habit, optionally filtered by date range",
+                "file": "app\\routes\\habit_log_routes.py"
+            },
+            {
+                "method": "DELETE",
+                "path": "/habits/{habit_id}/logs/{log_id}",
+                "description": "Remove a specific habit log entry",
+                "file": "app\\routes\\habit_log_routes.py"
+            },
+            {
+                "method": "GET",
+                "path": "/dashboard/weekly",
+                "description": "Return weekly completion percentages and streak information for all of the user's habits",
+                "file": "app\\routes\\dashboard_routes.py"
+            }
+        ],
+        "database_schema": [
+            {
+                "table_name": "users",
+                "columns": [
+                    {
+                        "name": "id",
+                        "type": "Integer",
+                        "is_primary_key": true,
+                        "is_nullable": false
+                    },
+                    {
+                        "name": "email",
+                        "type": "String",
+                        "is_primary_key": false,
+                        "is_nullable": false
+                    },
+                    {
+                        "name": "password_hash",
+                        "type": "String",
+                        "is_primary_key": false,
+                        "is_nullable": false
+                    },
+                    {
+                        "name": "created_at",
+                        "type": "DateTime",
+                        "is_primary_key": false,
+                        "is_nullable": false
+                    },
+                    {
+                        "name": "is_active",
+                        "type": "Boolean",
+                        "is_primary_key": false,
+                        "is_nullable": false
+                    }
+                ]
+            },
+            {
+                "table_name": "habits",
+                "columns": [
+                    {
+                        "name": "id",
+                        "type": "Integer",
+                        "is_primary_key": true,
+                        "is_nullable": false
+                    },
+                    {
+                        "name": "user_id",
+                        "type": "Integer",
+                        "is_primary_key": false,
+                        "is_nullable": false
+                    },
+                    {
+                        "name": "name",
+                        "type": "String",
+                        "is_primary_key": false,
+                        "is_nullable": false
+                    },
+                    {
+                        "name": "description",
+                        "type": "String",
+                        "is_primary_key": false,
+                        "is_nullable": true
+                    },
+                    {
+                        "name": "created_at",
+                        "type": "DateTime",
+                        "is_primary_key": false,
+                        "is_nullable": false
+                    },
+                    {
+                        "name": "is_active",
+                        "type": "Boolean",
+                        "is_primary_key": false,
+                        "is_nullable": false
+                    },
+                    {
+                        "name": "streak",
+                        "type": "Integer",
+                        "is_primary_key": false,
+                        "is_nullable": false
+                    },
+                    {
+                        "name": "last_completed_date",
+                        "type": "Date",
+                        "is_primary_key": false,
+                        "is_nullable": true
+                    }
+                ]
+            },
+            {
+                "table_name": "habit_logs",
+                "columns": [
+                    {
+                        "name": "id",
+                        "type": "Integer",
+                        "is_primary_key": true,
+                        "is_nullable": false
+                    },
+                    {
+                        "name": "habit_id",
+                        "type": "Integer",
+                        "is_primary_key": false,
+                        "is_nullable": false
+                    },
+                    {
+                        "name": "date",
+                        "type": "Date",
+                        "is_primary_key": false,
+                        "is_nullable": false
+                    },
+                    {
+                        "name": "created_at",
+                        "type": "DateTime",
+                        "is_primary_key": false,
+                        "is_nullable": false
+                    }
+                ]
+            },
+            {
+                "table_name": "password_reset_tokens",
+                "columns": [
+                    {
+                        "name": "id",
+                        "type": "Integer",
+                        "is_primary_key": true,
+                        "is_nullable": false
+                    },
+                    {
+                        "name": "user_id",
+                        "type": "Integer",
+                        "is_primary_key": false,
+                        "is_nullable": false
+                    },
+                    {
+                        "name": "token",
+                        "type": "String",
+                        "is_primary_key": false,
+                        "is_nullable": false
+                    },
+                    {
+                        "name": "expires_at",
+                        "type": "DateTime",
+                        "is_primary_key": false,
+                        "is_nullable": false
+                    },
+                    {
+                        "name": "created_at",
+                        "type": "DateTime",
+                        "is_primary_key": false,
+                        "is_nullable": false
+                    }
+                ]
+            }
+        ],
+        "folder_structure": {
+            "backend": [
+                "app",
+                "app/models",
+                "app/schemas",
+                "app/routes",
+                "app/services",
+                "app/utils",
+                "app/dependencies",
+                "app/config"
+            ]
+        },
+        "frontend_structure": {
+            "pages": [
+                "Signup",
+                "Login",
+                "PasswordResetRequest",
+                "PasswordReset",
+                "HabitList",
+                "HabitDetail",
+                "HabitEdit",
+                "Dashboard"
+            ],
+            "components": [
+                "Header",
+                "Footer",
+                "HabitCard",
+                "HabitForm",
+                "HabitLogButton",
+                "StreakBadge",
+                "Pagination",
+                "SearchBar",
+                "DashboardChart",
+                "ProfileMenu",
+                "Modal",
+                "Button",
+                "Input",
+                "Alert",
+                "LoadingSpinner"
+            ]
+        }
+    },
+    "provider": "auto",
+    "generated_at": "2026-06-27T16:21:36.527668",
+    "generation_time_seconds": 17.73,
+    "version": "1.0"
+}
