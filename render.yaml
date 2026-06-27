@@ -1,16 +1,17 @@
 services:
   - type: web
     name: habit-tracker-backend
-    env: python
+    runtime: python
     buildCommand: pip install -r app/requirements.txt
     startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: SECRET_KEY
         generateValue: true
 
-  - type: static
+  - type: web
+    runtime: static
     name: habit-tracker-frontend
-    buildCommand: npm run build
+    buildCommand: npm install && npm run build
     staticPublishPath: dist
     routes:
       - type: rewrite
