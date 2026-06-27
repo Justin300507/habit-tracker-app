@@ -78,6 +78,10 @@ def login(request: AuthLoginRequest, db: Session = Depends(get_db)):
     access_token = create_access_token(data={"sub": str(user.id)})
     return {"access_token": access_token, "token_type": "bearer"}
 
+@auth_router.get("/auth/me")
+def get_me(current_user=Depends(get_current_user)):
+    return {"id": current_user.id, "email": current_user.email}
+
 @auth_router.post("/auth/password-reset-request")
 def password_reset_request(request: PasswordResetRequest, db: Session = Depends(get_db)):
     User = _get_user_model()

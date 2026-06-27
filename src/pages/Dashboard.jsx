@@ -12,12 +12,12 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [resStats, resHabits] = await Promise.all([
-          API.get('/dashboard/weekly'),
-          API.get('/habits'),
-        ]);
-        setItems(resStats.data.items || []);
+        const resHabits = await API.get('/habits');
         setRecent((resHabits.data.items || []).slice(0, 5));
+      } catch (err) {}
+      try {
+        const resStats = await API.get('/dashboard/weekly');
+        setItems(resStats.data.items || []);
       } catch (err) {}
       setLoading(false);
     };
