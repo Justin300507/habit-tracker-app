@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import Button from '../components/Button';
 import LoadingSpinner from '../components/LoadingSpinner';
 import API from '../api';
@@ -7,6 +7,7 @@ import StreakBadge from '../components/StreakBadge';
 
 const HabitDetail = () => {
   const { habitId } = useParams();
+  const navigate = useNavigate();
   const [habit, setHabit] = useState(null);
   const [loading, setLoading] = useState(true);
   const [logging, setLogging] = useState(false);
@@ -15,7 +16,9 @@ const HabitDetail = () => {
       try {
         const res = await API.get(`/habits/${habitId}`);
         setHabit(res.data);
-      } catch (err) {}
+      } catch (err) {
+        if (err.response?.status === 404) navigate('/habits');
+      }
       setLoading(false);
     };
     fetchHabit();
