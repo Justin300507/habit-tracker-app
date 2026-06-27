@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import Input from './Input';
 import Button from './Button';
 
-const HabitForm = ({ initialData = {}, onSubmit, onCancel }) => {
+const HabitForm = ({ initialData = {}, onSubmit, onCancel, saving = false }) => {
   const [title, setTitle] = useState(initialData.title || '');
   const [description, setDescription] = useState(initialData.description || '');
   const [isActive, setIsActive] = useState(initialData.is_active ?? true);
@@ -19,7 +19,7 @@ const HabitForm = ({ initialData = {}, onSubmit, onCancel }) => {
         <label htmlFor="active" className="ml-2 text-sm text-slate-700 dark:text-slate-300">Active</label>
       </div>
       <div className="flex gap-2">
-        <Button type="submit">Save</Button>
+        <Button type="submit" disabled={saving}>{saving ? 'Saving…' : 'Save'}</Button>
         {onCancel && <Button type="button" onClick={onCancel} className="bg-slate-200 hover:bg-slate-300 text-slate-800">Cancel</Button>}
       </div>
     </form>
