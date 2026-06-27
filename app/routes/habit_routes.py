@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, Path, Response, st
 from sqlalchemy.orm import Session
 from sqlalchemy import and_
 from typing import Optional
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date as date_type
 
 from app.database import get_db
 from app.models.habits import Habit
@@ -29,9 +29,7 @@ def _log_to_dict(l: HabitLog) -> dict:
     return {
         "id": l.id,
         "habit_id": l.habit_id,
-        "logged_at": l.logged_at,
-        "title": getattr(l, "title", None),
-        "description": getattr(l, "description", None),
+        "date": str(l.date),
     }
 
 
@@ -80,11 +78,11 @@ def get_habit(
     if not habit:
         raise HTTPException(status_code=404, detail="Not found")
     today = datetime.utcnow().date()
-    logs = db.query(HabitLog).filter(HabitLog.habit_id == habit.id).order_by(HabitLog.logged_at.desc()).all()
+    logs = db.query(HabitLog).filter(HabitLog.habit_id == habit.id).order_by(HabitLog.date.desc()).all()
     streak = 0
     expected = today
     for log in logs:
-        log_day = log.logged_at.date() if isinstance(log.logged_at, datetime) else log.logged_at
+        log_day = log.date
         if log_day == expected:
             streak += 1
             expected -= timedelta(days=1)
@@ -143,9 +141,7 @@ def create_habit_log(
         raise HTTPException(status_code=404, detail="Habit not found")
     log = HabitLog(
         habit_id=habit.id,
-        title=log_in.title,
-        description=log_in.description,
-        logged_at=log_in.logged_at or datetime.utcnow(),
+        date=log_in.date or datetime.utcnow().date(),
     )
     db.add(log)
     habit.streak = (habit.streak or 0) + 1
@@ -167,7 +163,7 @@ def list_habit_logs(
     if not habit:
         raise HTTPException(status_code=404, detail="Habit not found")
     total = db.query(HabitLog).filter(HabitLog.habit_id == habit.id).count()
-    logs = db.query(HabitLog).filter(HabitLog.habit_id == habit.id).offset(offset).limit(limit).all()
+    logs = db.query(HabitLog).filter(HabitLog.habit_id == habit.id).order_by(HabitLog.date.desc()).offset(offset).limit(limit).all()
     return {"items": [_log_to_dict(l) for l in logs], "total": total}
 
 

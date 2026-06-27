@@ -26,7 +26,7 @@ const HabitDetail = () => {
   const handleLog = async () => {
     setLogging(true);
     try {
-      await API.post(`/habits/${habitId}/log`, { title: 'Logged' });
+      await API.post(`/habits/${habitId}/log`, {});
       const res = await API.get(`/habits/${habitId}`);
       setHabit(res.data);
     } catch (err) {}
