@@ -5,17 +5,21 @@ import Button from '../components/Button';
 import API from '../api';
 
 const parseError = (err) => {
+  if (!err.response) return null; // network error — handled separately
   const detail = err.response?.data?.detail;
-  if (!detail) return err.message || 'Sign up failed. Please try again.';
+  if (!detail) return 'Sign up failed. Please try again.';
   if (typeof detail === 'string') return detail;
   if (Array.isArray(detail)) return detail.map(d => d.msg).join(', ');
   return 'Sign up failed. Please try again.';
 };
 
+const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+
 const Signup = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [status, setStatus] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -27,14 +31,33 @@ const Signup = () => {
     }
     setError('');
     setLoading(true);
-    try {
-      await API.post('/auth/signup', { email, password });
-      navigate('/login');
-    } catch (err) {
-      setError(parseError(err));
-    } finally {
-      setLoading(false);
+
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      try {
+        setStatus(attempt === 1 ? 'Signing up…' : `Backend waking up, retrying… (${attempt}/3)`);
+        await API.post('/auth/signup', { email, password });
+        navigate('/login');
+        return;
+      } catch (err) {
+        const msg = parseError(err);
+        if (msg) {
+          // Real API error (wrong email, already registered, etc.) — don't retry
+          setError(msg);
+          setStatus('');
+          setLoading(false);
+          return;
+        }
+        // Network error — Render is sleeping, wait and retry
+        if (attempt < 3) {
+          setStatus(`Backend is starting up… retrying in 15s (${attempt}/3)`);
+          await sleep(15000);
+        }
+      }
     }
+
+    setError('Backend took too long to respond. Wait 30 seconds then try again.');
+    setStatus('');
+    setLoading(false);
   };
 
   return (
@@ -54,8 +77,9 @@ const Signup = () => {
             <p className="text-xs text-slate-400">Must be at least 8 characters</p>
           </div>
           {error && <p className="text-red-500 text-sm">{error}</p>}
+          {status && <p className="text-indigo-500 text-sm">{status}</p>}
           <Button type="submit" className="w-full justify-center" disabled={loading}>
-            {loading ? 'Creating account...' : 'Sign Up'}
+            {loading ? status || 'Signing up…' : 'Sign Up'}
           </Button>
         </form>
         <p className="text-center text-sm text-slate-500 mt-4">
