@@ -12,7 +12,7 @@ const HabitList = () => {
     const fetchHabits = async () => {
       try {
         const res = await API.get('/habits');
-        setHabits(res.data);
+        setHabits(res.data.items || []);
       } catch (err) {}
       setLoading(false);
     };

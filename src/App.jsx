@@ -8,6 +8,7 @@ import Dashboard from './pages/Dashboard';
 import HabitList from './pages/HabitList';
 import HabitDetail from './pages/HabitDetail';
 import HabitEdit from './pages/HabitEdit';
+import HabitNew from './pages/HabitNew';
 import Sidebar from './components/Sidebar';
 import Header from './components/Header';
 
@@ -30,6 +31,7 @@ const App = () => (
       <Route path="/password-reset" element={<PasswordReset />} />
       <Route path="/dashboard" element={<Layout><Dashboard /></Layout>} />
       <Route path="/habits" element={<Layout><HabitList /></Layout>} />
+      <Route path="/habits/new" element={<Layout><HabitNew /></Layout>} />
       <Route path="/habits/:habitId" element={<Layout><HabitDetail /></Layout>} />
       <Route path="/habits/:habitId/edit" element={<Layout><HabitEdit /></Layout>} />
       <Route path="*" element={<Navigate to="/login" replace />} />

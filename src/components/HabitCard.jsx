@@ -10,12 +10,12 @@ const HabitCard = ({ habit }) => (
         <CheckSquare size={18} className="text-indigo-600 dark:text-indigo-400" />
       </div>
       <div>
-        <p className="text-sm font-semibold text-slate-900 dark:text-white">{habit.name}</p>
+        <p className="text-sm font-semibold text-slate-900 dark:text-white">{habit.title}</p>
         <p className="text-xs text-slate-500 dark:text-slate-400">{habit.description}</p>
       </div>
     </div>
     <div className="flex items-center gap-2">
-      <StreakBadge streak={habit.streak} />
+      <StreakBadge streak={habit.current_streak || 0} />
       <Link to={`/habits/${habit.id}`} className="text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1">
         <Calendar size={14} /> Details
       </Link>

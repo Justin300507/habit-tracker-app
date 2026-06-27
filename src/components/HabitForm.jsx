@@ -3,16 +3,16 @@ import Input from './Input';
 import Button from './Button';
 
 const HabitForm = ({ initialData = {}, onSubmit, onCancel }) => {
-  const [name, setName] = useState(initialData.name || '');
+  const [title, setTitle] = useState(initialData.title || '');
   const [description, setDescription] = useState(initialData.description || '');
   const [isActive, setIsActive] = useState(initialData.is_active ?? true);
   const handleSubmit = e => {
     e.preventDefault();
-    onSubmit({ name, description, is_active: isActive });
+    onSubmit({ title, description, is_active: isActive });
   };
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <Input label="Name" value={name} onChange={e => setName(e.target.value)} placeholder="Habit name" />
+      <Input label="Name" value={title} onChange={e => setTitle(e.target.value)} placeholder="Habit name" />
       <Input label="Description" value={description} onChange={e => setDescription(e.target.value)} placeholder="Optional description" />
       <div className="flex items-center">
         <input id="active" type="checkbox" checked={isActive} onChange={e => setIsActive(e.target.checked)} className="form-checkbox h-4 w-4 text-indigo-600 border-slate-300 rounded" />

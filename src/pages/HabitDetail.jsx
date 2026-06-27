@@ -23,7 +23,7 @@ const HabitDetail = () => {
   const handleLog = async () => {
     setLogging(true);
     try {
-      await API.post(`/habits/${habitId}/log`);
+      await API.post(`/habits/${habitId}/log`, { title: 'Logged' });
       const res = await API.get(`/habits/${habitId}`);
       setHabit(res.data);
     } catch (err) {}
@@ -33,9 +33,9 @@ const HabitDetail = () => {
   if (!habit) return <p className="text-slate-500 dark:text-slate-400">Habit not found.</p>;
   return (
     <div className="bg-white dark:bg-slate-800 rounded-xl p-6 border border-slate-100 dark:border-slate-700">
-      <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">{habit.name}</h2>
+      <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">{habit.title}</h2>
       <p className="text-slate-500 dark:text-slate-400 mb-4">{habit.description}</p>
-      <StreakBadge streak={habit.streak} />
+      <StreakBadge streak={habit.current_streak || 0} />
       <div className="mt-4">
         <Button onClick={handleLog} disabled={logging}>
           {logging ? 'Logging...' : 'Mark Today Completed'}
