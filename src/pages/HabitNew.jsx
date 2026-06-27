@@ -20,7 +20,7 @@ const HabitNew = () => {
     setError('');
     setSaving(true);
     try {
-      const res = await API.post('/habits', { title: data.title, description: data.description || null });
+      const res = await API.post('/habits', { name: data.name, description: data.description || null });
       navigate(`/habits/${res.data.id}`);
     } catch (err) {
       setError(parseError(err));
